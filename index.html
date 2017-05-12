@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel='stylesheet' type='text/css' href='css/bootstrap.min.css'>
+		<script src="js/jquery-1.11.2.min.js" </script>
+		<script src="js/bootstrap.min.js" </script>
+		<script src="subject.js"></script>
+		<script src = "observerList.js"></script>
+		<script src="observer.js"></script>
+		<script src="main.js"></script>
+		<script src="ajax.js"></script>
+		<title>ObserverJS</title>
+		<style >
+		.boxy{border-bottom:solid 1px lightblue;height:30px;min-height:30px;padding:3px;}
+		.pay_button{width:125px;min-width:125px;}
+		</style>
+
+	</head>
+	<body >
+
+	<div class="container" style='width:100%;background-color:lightyellow;border:solid green 2px;' >
+		<div class="container">
+			<div class="row boxy">
+				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 " >
+					<button onclick="whoKnows();">Observer Knows</button>
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 " >
+					<button onclick="DBToLocal();">DB to Local</button>
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 " >
+					<button onclick="LocalToDB();">Local to DB</button>
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 " >
+					<button onclick="syncData();">Sync Data</button>
+				</div>
+
+			</div>
+			<div class="row boxy">
+				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 " >
+					start:
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 " >
+					<input name='start_amount' id='start_amount' value=''   onchange='startAmount(this);'  placeholder='starting amount'/>
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 " >
+					paid out:
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 " >
+					<input name='paid_out' id='paid_out' value=''  DISABLED placeholder='paid out'/>
+				</div>
+
+			</div>
+			<div class="row boxy">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+		 			<button name='bug' onclick="addWorkorder(this);">+ expense</button>
+				</div>
+			</div>
+		
+
+		</div>
+		<div id='wo_list' class="container">
+			 <!-- insert additional expenses into this div -->
+			 
+
+		</div>
+		<div class="container">
+			<div class="row boxy">
+				<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8  " >
+					subtotal:
+				</div>
+				<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2  " >
+					<input name='subtotal' id='subtotal' value='' placeholder='subtotal'/>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	 
+	<div id="doc_data"></div>
+	 
+		<script>
+			main();
+			//ajax_datastring_URL_callback(dataString, URL, callback) 
+			function callback(data){
+				console.log('callback',data);
+				localStorage.setItem('data',data);
+				console.log(JSON.parse(data));
+			}
+			function DBToLocal(){
+				var URL = "http://localhost:8888/observerJS/server.php";
+				var dataString = "method=dbtolocal";
+				ajax_datastring_URL_callback(dataString, URL, callback); 
+			}
+			function LocalToDB(){
+				var URL = "http://localhost:8888/observerJS/server.php";
+
+				var data = localStorage.getItem('data');
+
+				var dataString = "method=localtodb&data="+data;
+				ajax_datastring_URL_callback(dataString, URL, callback2) ;
+			}
+			function callback2(data){
+				console.log('callback',data);
+				//localStorage.setItem('data',data);
+				//console.log(JSON.parse(data));
+			}
+ 
+
+
+			function syncData(){
+
+				networkCheck();
+				 	if(NETWORK_STATUS === "ONLINE"){
+				 		console.log('Network connection CHECK!');
+				 		syncLocalToDB();
+
+				 	}else{
+				 		console.log('currently NO NETWORK connection')
+				 	}
+				
+			}
+			function syncComplete(data){
+					console.log('sync complete:'+data);
+					var obj = JSON.parse(data);
+					console.log(obj);
+					console.log('now ready to parse into human readable html');
+					var html ="";
+					for(var doc in obj){
+						html += "<div class='row'>";
+						html += "<div class='col'>"+doc.name+"</div>";
+						html += "</div>";
+					}
+					document.getElementById('doc_data').innerHTML = html;
+					
+
+			}
+			function syncLocalToDB(){
+				var URL = "http://localhost:8888/observerJS/server.php";
+				var data = localStorage.getItem('data');
+				var dataString = "method=localtodb&data="+data;
+				ajax_datastring_URL_callback(dataString, URL, syncDBToLocal ) ;
+			}
+			function syncDBToLocal(data){
+				console.log('sync 1:'+ data);
+				var URL = "http://localhost:8888/observerJS/server.php";
+				var dataString = "method=dbtolocal";
+				ajax_datastring_URL_callback(dataString, URL, syncComplete); 
+			}
+
+
+		</script>
+	</body>
+</html>

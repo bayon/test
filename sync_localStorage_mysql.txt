@@ -1,0 +1,90 @@
+sync_localStorage_mysql.txt
+
+<script>
+			main();
+			//ajax_datastring_URL_callback(dataString, URL, callback) 
+			function callback(data){
+				console.log('callback',data);
+				localStorage.setItem('data',data);
+				console.log(JSON.parse(data));
+			}
+			function DBToLocal(){
+				var URL = "http://localhost:8888/observerJS/server.php";
+				var dataString = "method=dbtolocal";
+				ajax_datastring_URL_callback(dataString, URL, callback); 
+			}
+			function LocalToDB(){
+				var URL = "http://localhost:8888/observerJS/server.php";
+
+				var data = localStorage.getItem('data');
+
+				var dataString = "method=localtodb&data="+data;
+				ajax_datastring_URL_callback(dataString, URL, callback2) ;
+			}
+			function callback2(data){
+				console.log('callback',data);
+				//localStorage.setItem('data',data);
+				//console.log(JSON.parse(data));
+			}
+
+
+		</script>
+
+<?php
+//server.php
+
+
+$HOST = "localhost";
+$USER = "root";
+$PASS = "root";
+$DB="communitywall";
+$TABLE="documents";
+
+$con=mysqli_connect($HOST,$USER,$PASS,$DB);
+// Check connection
+if (mysqli_connect_errno()){
+  echo "Failed to connect to MySQL: " . mysqli_connect_error();
+}
+
+if($_POST['method']=='dbtolocal'){
+	
+	$sql="SELECT * FROM ".$TABLE."  ";
+	$result=mysqli_query($con,$sql);
+	while($row=mysqli_fetch_assoc($result)){
+	   $data[] = $row; 
+	}
+	echo(json_encode($data));
+}else{
+	//method == localtodb
+	//echo($_POST['data']);
+	$data = json_decode($_POST['data']);
+
+	$sql = "INSERT INTO ".$DB.".".$TABLE." (id, parent_id, name, type, url, date_created) VALUES (NULL, '0', '".$data[0]->name."', 'x', 'x', '');";
+	
+	//echo($sql);
+	$result=mysqli_query($con,$sql);
+	echo($result);
+	//print_r($data);
+	//echo($data[0]->name);
+	//echo('ok');
+	/*
+	stdClass 
+	$array[0]->id should echo 1
+	*/
+
+	/*
+INSERT INTO 'documents' ('id', 'parent_id', 'name', 'type', 'url', 'date_created') VALUES (NULL, '', '', '', '', '');
+	*/
+}
+
+
+
+
+
+
+
+// Free result set
+mysqli_free_result($result);
+mysqli_close($con);
+
+?>
