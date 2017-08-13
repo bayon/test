@@ -20,6 +20,9 @@
 
 	<div class="container" style='width:100%;background-color:lightyellow;border:solid green 2px;' >
 		<div class="container">
+			<hr>
+			<h3>azure deploy</h3>
+		</hr>
 			<div class="row boxy">
 				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 " >
 					<button onclick="whoKnows();">Observer Knows</button>
@@ -55,12 +58,12 @@
 		 			<button name='bug' onclick="addWorkorder(this);">+ expense</button>
 				</div>
 			</div>
-		
+
 
 		</div>
 		<div id='wo_list' class="container">
 			 <!-- insert additional expenses into this div -->
-			 
+
 
 		</div>
 		<div class="container">
@@ -76,12 +79,12 @@
 		</div>
 	</div>
 
-	 
+
 	<div id="doc_data"></div>
-	 
+
 		<script>
 			main();
-			//ajax_datastring_URL_callback(dataString, URL, callback) 
+			//ajax_datastring_URL_callback(dataString, URL, callback)
 			function callback(data){
 				console.log('callback',data);
 				localStorage.setItem('data',data);
@@ -90,7 +93,7 @@
 			function DBToLocal(){
 				var URL = "http://localhost:8888/observerJS/server.php";
 				var dataString = "method=dbtolocal";
-				ajax_datastring_URL_callback(dataString, URL, callback); 
+				ajax_datastring_URL_callback(dataString, URL, callback);
 			}
 			function LocalToDB(){
 				var URL = "http://localhost:8888/observerJS/server.php";
@@ -105,7 +108,7 @@
 				//localStorage.setItem('data',data);
 				//console.log(JSON.parse(data));
 			}
- 
+
 
 
 			function syncData(){
@@ -118,7 +121,7 @@
 				 	}else{
 				 		console.log('currently NO NETWORK connection')
 				 	}
-				
+
 			}
 			function syncComplete(data){
 					console.log('sync complete:'+data);
@@ -132,7 +135,7 @@
 						html += "</div>";
 					}
 					document.getElementById('doc_data').innerHTML = html;
-					
+
 
 			}
 			function syncLocalToDB(){
@@ -145,7 +148,7 @@
 				console.log('sync 1:'+ data);
 				var URL = "http://localhost:8888/observerJS/server.php";
 				var dataString = "method=dbtolocal";
-				ajax_datastring_URL_callback(dataString, URL, syncComplete); 
+				ajax_datastring_URL_callback(dataString, URL, syncComplete);
 			}
 
 
